@@ -1,11 +1,13 @@
+import datetime
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from severstal_fastapi.database import engine, async_session_maker
 from severstal_fastapi.models import Coil, Base
-from severstal_fastapi.schemas import CoilAdd
+from severstal_fastapi.schemas import CoilAdd, CoilDelete
 
 
-class AsyncORM:
+class DbService:
     def __init__(self, session: AsyncSession):  # при инициализации принимает асинхронную сессию
         self.session = session
 
@@ -18,9 +20,16 @@ class AsyncORM:
     async def insert_coil(self, coil: CoilAdd):
         new_coil = Coil(**coil.model_dump())
         self.session.add(new_coil)
-        # flush взаимодействует с БД, поэтому пишем await
         await self.session.flush()
         await self.session.commit()
         return new_coil
+
+    async def update_deletion_date(self, coil: CoilDelete):
+        cur_coil = await self.session.get(Coil, coil.id)
+        if cur_coil.deletion_date is None:
+            cur_coil.deletion_date = datetime.datetime.utcnow()
+            await self.session.commit()
+        return cur_coil
+
 
 

@@ -3,24 +3,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 from severstal_fastapi.database import get_async_session
-from severstal_fastapi.service import AsyncORM
-from severstal_fastapi.schemas import CoilAdd
+from severstal_fastapi.service import DbService
+from severstal_fastapi.schemas import CoilAdd, CoilDelete
 
 router = APIRouter()
 
 
-async def get_todo_repository(session: AsyncSession = Depends(get_async_session)) -> AsyncORM:
-    return AsyncORM(session)
+async def get_db_service(session: AsyncSession = Depends(get_async_session)) -> DbService:
+    return DbService(session)
 
 
 @router.post("/coil, response_model=CoilFromDb")
-async def add_coil(coil: CoilAdd, repo: AsyncORM = Depends(get_todo_repository)):
-    return await repo.insert_coil(coil)
+async def add_coil(coil: CoilAdd, db: DbService = Depends(get_db_service)):
+    return await db.insert_coil(coil)
 
 
 @router.delete("/coil")
-async def delete_coil():
-    pass
+async def delete_coil(coil: CoilDelete, db: DbService = Depends(get_db_service)):
+    return await db.update_deletion_date(coil)
 
 
 @router.get("/coil")

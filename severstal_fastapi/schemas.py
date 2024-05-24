@@ -17,3 +17,7 @@ class Coil(CoilAdd):
 
 class CoilFromBd(Coil):
     pass
+
+
+class CoilDelete(BaseModel):
+    id: int
