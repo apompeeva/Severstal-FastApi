@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "severstal-fastapi"
+version = "0.1.0"
+description = ""
+authors = ["Anna <pompeeva.anna@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+alembic = "^1.13.1"
+sqlalchemy = "^2.0.30"
+asyncpg = "^0.29.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
