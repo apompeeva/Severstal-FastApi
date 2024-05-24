@@ -4,12 +4,16 @@ from pydantic import BaseModel
 from datetime import date
 
 
-class CoilCreate(BaseModel):
+class CoilAdd(BaseModel):
     length: int
     weight: int
 
 
-class Coil(CoilCreate):
+class Coil(CoilAdd):
     id: int
-    creation_date: date
+    creation_date: Optional[date]
     deletion_date: Optional[date]
+
+
+class CoilFromBd(Coil):
+    pass

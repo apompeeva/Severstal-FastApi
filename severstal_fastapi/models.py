@@ -1,8 +1,17 @@
-from sqlalchemy import MetaData, Integer, TIMESTAMP
+from typing import Optional
+
+from sqlalchemy import MetaData, Integer, TIMESTAMP, text
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 import datetime
 
-from database import Base
+
+
+metadata = MetaData()
+
+
+class Base(DeclarativeBase):
+    pass
+
 
 
 class Coil(Base):
@@ -11,7 +20,7 @@ class Coil(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     length: Mapped[int] = mapped_column(Integer, nullable=False)
     weight: Mapped[int] = mapped_column(Integer, nullable=False)
-    creation_date: Mapped[datetime.date] = mapped_column(TIMESTAMP, default=datetime.utcnow)
-    deletion_date: Mapped[datetime.date] = mapped_column(TIMESTAMP)
+    creation_date: Mapped[Optional[datetime.datetime]] = mapped_column(default=datetime.datetime.utcnow)
+    deletion_date: Mapped[Optional[datetime.datetime]]
 
 

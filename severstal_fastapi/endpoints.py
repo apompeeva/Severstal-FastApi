@@ -1,13 +1,21 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas import CoilCreate
+
+from severstal_fastapi.database import get_async_session
+from severstal_fastapi.service import AsyncORM
+from severstal_fastapi.schemas import CoilAdd
 
 router = APIRouter()
 
 
-@router.post("/coil")
-async def add_coil(coil: CoilCreate):
-    return
+async def get_todo_repository(session: AsyncSession = Depends(get_async_session)) -> AsyncORM:
+    return AsyncORM(session)
+
+
+@router.post("/coil, response_model=CoilFromDb")
+async def add_coil(coil: CoilAdd, repo: AsyncORM = Depends(get_todo_repository)):
+    return await repo.insert_coil(coil)
 
 
 @router.delete("/coil")
