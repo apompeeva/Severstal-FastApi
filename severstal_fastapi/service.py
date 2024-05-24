@@ -1,4 +1,5 @@
 import datetime
+from abc import ABC, abstractmethod
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,7 +8,19 @@ from severstal_fastapi.models import Coil, Base
 from severstal_fastapi.schemas import CoilAdd, CoilDelete
 
 
-class DbService:
+class DbService(ABC):
+
+    @staticmethod
+    @abstractmethod
+    async def create_tables():
+        pass
+
+    @abstractmethod
+    async def insert_coil(self) -> Coil:
+        pass
+
+
+class SqlAlchemyDbService(DbService):
     def __init__(self, session: AsyncSession):  # при инициализации принимает асинхронную сессию
         self.session = session
 
