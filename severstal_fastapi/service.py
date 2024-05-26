@@ -9,13 +9,6 @@ from severstal_fastapi.database import engine
 from severstal_fastapi.models import Coil, Base
 from severstal_fastapi.schemas import CoilAdd, CoilDelete, CoilStats, CoilFromBd
 
-filter_obj = {}
-conditions = []
-if ids := filter_obj.get("id"):
-    conditions.append(Coil.id in ids)
-filtered_coils = (select(Coil.id, Coil.length, Coil.weight, Coil.creation_date, Coil.deletion_date)
-                  .select_from(Coil).where(and_(*conditions)))
-
 
 class Filter:
     def __init__(self, id_range_start: Optional[int] = None,
@@ -89,16 +82,18 @@ class SqlAlchemyDbService(DbService):
 
     async def update_deletion_date(self, coil: CoilDelete):
         cur_coil = await self.session.get(Coil, coil.id)
-        if cur_coil.deletion_date is None:
-            cur_coil.deletion_date = datetime.datetime.utcnow()
-            await self.session.commit()
-        return cur_coil
+        try:
+            if cur_coil.deletion_date is None:
+                cur_coil.deletion_date = datetime.date.today()
+                await self.session.commit()
+                return cur_coil
+        except AttributeError:
+            return "Coil with this id was not found"
 
     async def get_coil(self, filter: Filter):
         query = (select(Coil.id, Coil.length, Coil.weight, Coil.creation_date, Coil.deletion_date)
                  .select_from(Coil))
         query = filter.get_conditions(query)
-        print(query.compile(dialect=engine.dialect))
         res = await self.session.execute(query)
         result = res.fetchall()
         print(result)
@@ -135,10 +130,8 @@ class SqlAlchemyDbService(DbService):
             func.max(coils_in_storage_cte.c.weight).label("max_weight"),
             func.min(coils_in_storage_cte.c.weight).label("min_weight"),
             func.sum(coils_in_storage_cte.c.weight).label("total_weight"),
-            func.max(func.date_part('day', coils_in_storage_cte.c.deletion_date -
-                                    coils_in_storage_cte.c.creation_date)).label("max_duration"),
-            func.min(func.date_part('day', coils_in_storage_cte.c.deletion_date -
-                                    coils_in_storage_cte.c.creation_date)).label("min_duration")
+            func.max(coils_in_storage_cte.c.deletion_date - coils_in_storage_cte.c.creation_date).label("max_duration"),
+            func.min(coils_in_storage_cte.c.deletion_date - coils_in_storage_cte.c.creation_date).label("min_duration")
         ).select_from(coils_in_storage_cte).cte("summary")
 
         main_query = select(
@@ -162,7 +155,6 @@ class SqlAlchemyDbService(DbService):
                 literal_column("1=1")
             )
         )
-        print(main_query.compile(dialect=engine.dialect))
         res = await self.session.execute(main_query)
         result = res.fetchall()
         print(result)

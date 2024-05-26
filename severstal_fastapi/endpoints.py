@@ -25,8 +25,6 @@ async def delete_coil(coil: CoilDelete, db: SqlAlchemyDbService = Depends(get_db
     return await db.update_deletion_date(coil)
 
 
-""""""
-
 
 @router.get("/coil")
 async def get_coils(id_range_start: Optional[int] = None,
