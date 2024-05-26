@@ -37,4 +37,3 @@ class CoilStats(BaseModel):
     min_duration: int
 
 
-
