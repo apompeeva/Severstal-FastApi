@@ -57,6 +57,7 @@ DTO рулона:
     ```bash
     git clone https://gitlab.com/python_projects9153019/salary_info_api.git
     ```
+   
 2. Cоздать и активировать виртуальное окружение, установить зависимости.
 
     - установить poetry
@@ -66,6 +67,7 @@ DTO рулона:
     poetry config virtualenvs.in-project true
     poetry install
     ```
+   
 3. В корневой директории cоздать .env файл по следующему шаблону:
 
     ```
@@ -75,10 +77,12 @@ DTO рулона:
    DB_USER=''
    DB_PASS=''
     ```
+   
 4. Применить миграции
     ```bash
     alembic upgrade head
     ```
+   
 5. Запустить проект
     ```bash
     uvicorn severstal_fastapi.main:app --reload
